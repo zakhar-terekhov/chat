@@ -63,6 +63,8 @@ async def main():
 
     if authorization is None:
         print("Неизвестный токен. Проверьте его или зарегистрируйте заново.")
+        writer.close()
+        await writer.wait_closed()
 
     while True:
         await read_message(reader)
