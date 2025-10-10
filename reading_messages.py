@@ -2,13 +2,9 @@ import argparse
 import asyncio
 import datetime
 
-import aiofiles
 from environs import Env
 
-
-async def write_message_to_file(message: str, history_path: str):
-    async with aiofiles.open(history_path, "a") as f:
-        await f.write(message)
+from saving_history import write_message_to_file
 
 
 async def main():
@@ -16,13 +12,12 @@ async def main():
     env.read_env()
 
     parser = argparse.ArgumentParser(
-        prog="Чат",
         description="""Отображает чат с сервера по заданному хосту и порту.
                     Чат выводится в консоль и записывается в файл.""",
     )
 
     parser.add_argument("-H", "--host", default=env.str("HOST"), help="Host")
-    parser.add_argument("-P", "--port", default=env.int("PORT"), help="Port")
+    parser.add_argument("-P", "--port", default=env.int("READ_PORT"), help="Read port for reading chat")
     parser.add_argument("-F", "--history", default=env.str("HISTORY"), help="Path to chat history")
 
     args = parser.parse_args()
