@@ -1,24 +1,30 @@
 import argparse
 import asyncio
+import logging
 
 import aioconsole
 
 from environs import Env
 
+logger = logging.getLogger("sender")
 
-async def authorized(token,reader, writer):
+
+async def authorized(token, reader, writer):
     writer.write(f"{token}\n\n".encode())
     await writer.drain()
     await read_message(reader)
 
 
 async def read_message(reader):
-    message = await reader.read(200)
-    print(message.decode())
+    raw = await reader.read(200)
+    message = raw.decode()
+    logger.info(message)
+    print(message)
 
 
 async def write_message(writer):
     message = await aioconsole.ainput()
+    logger.info(message)
     writer.write(f"{message}\n\n".encode())
     await writer.drain()
 
@@ -28,6 +34,12 @@ async def main():
     env.read_env()
 
     token = env.str("TOKEN")
+
+    logging.basicConfig(
+        level=logging.INFO,
+        filename="history.log",
+        format="%(levelname)s:%(name)s:%(message)s",
+    )
 
     parser = argparse.ArgumentParser(
         description="""Позволяет отправлять сообщения в чат.
