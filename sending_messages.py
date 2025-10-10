@@ -6,8 +6,8 @@ import aioconsole
 from environs import Env
 
 
-async def authorized(reader, writer):
-    writer.write(f"fd97791e-a5d6-11f0-a5a4-0242ac110003\n\n".encode())
+async def authorized(token,reader, writer):
+    writer.write(f"{token}\n\n".encode())
     await writer.drain()
     await read_message(reader)
 
@@ -27,6 +27,8 @@ async def main():
     env = Env()
     env.read_env()
 
+    token = env.str("TOKEN")
+
     parser = argparse.ArgumentParser(
         description="""Позволяет отправлять сообщения в чат.
         После запуска данного скрипта можно создать нового пользователя или авторизоваться по токену.
@@ -45,7 +47,7 @@ async def main():
 
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
-    await authorized(reader, writer)
+    await authorized(token, reader, writer)
 
     while True:
         await read_message(reader)
