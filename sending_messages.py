@@ -33,7 +33,7 @@ async def main():
     env = Env()
     env.read_env()
 
-    token = env.str("TOKEN")
+    token = "a-a-a"
 
     logging.basicConfig(
         level=logging.INFO,
@@ -59,7 +59,10 @@ async def main():
 
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
-    await authorized(token, reader, writer)
+    authorization = await authorized(token, reader, writer)
+
+    if authorization is None:
+        print("Неизвестный токен. Проверьте его или зарегистрируйте заново.")
 
     while True:
         await read_message(reader)
