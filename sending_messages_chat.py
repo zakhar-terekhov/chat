@@ -24,7 +24,7 @@ async def read_message(reader):
     print(message)
 
 
-async def write_message(writer):
+async def submit_message(writer):
     message = await aioconsole.ainput()
     logger.info(message)
     writer.write(f"{message}\n\n".encode())
@@ -72,7 +72,7 @@ async def main():
 
     while True:
         await read_message(reader)
-        await write_message(writer)
+        await submit_message(writer)
 
 
 if __name__ == "__main__":
