@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import json
 import logging
 
 import aioconsole
@@ -9,14 +10,15 @@ from environs import Env
 logger = logging.getLogger("sender")
 
 
-async def authorized(token, reader, writer):
+async def authorize(token, reader, writer):
     writer.write(f"{token}\n\n".encode())
     await writer.drain()
-    await read_message(reader)
+    raw = await reader.readline()
+    return raw.decode()
 
 
 async def read_message(reader):
-    raw = await reader.read(200)
+    raw = await reader.readline()
     message = raw.decode()
     logger.info(message)
     print(message)
@@ -33,7 +35,7 @@ async def main():
     env = Env()
     env.read_env()
 
-    token = "a-a-a"
+    token = env.str("TOKEN")
 
     logging.basicConfig(
         level=logging.INFO,
@@ -59,12 +61,13 @@ async def main():
 
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
-    authorization = await authorized(token, reader, writer)
+    await read_message(reader)
 
-    if authorization is None:
+    response = await authorize(token, reader, writer)
+
+    if json.loads(response) is None:
         print("Неизвестный токен. Проверьте его или зарегистрируйте заново.")
-        writer.close()
-        await writer.wait_closed()
+        return
 
     while True:
         await read_message(reader)
