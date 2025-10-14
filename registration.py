@@ -4,7 +4,8 @@ import logging
 
 from environs import Env
 
-from sending_messages_chat import submit_message, read_message
+from message import read_message, submit_message
+
 
 logger = logging.getLogger("registration")
 
@@ -40,6 +41,7 @@ async def main():
     for _ in range(2):
         await submit_message(writer, "\n")
         await read_message(reader)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -3,11 +3,12 @@ import asyncio
 import json
 import logging
 
-import aioconsole
-
 from environs import Env
 
-logger = logging.getLogger("sender")
+from message import read_message, submit_message
+
+
+logger = logging.getLogger("authorization")
 
 
 async def authorize(token, reader, writer):
@@ -15,20 +16,6 @@ async def authorize(token, reader, writer):
     await writer.drain()
     raw = await reader.readline()
     return raw.decode()
-
-
-async def read_message(reader):
-    raw = await reader.readline()
-    message = raw.decode()
-    logger.info(message)
-    print(message)
-
-
-async def submit_message(writer, line_break="\n\n"):
-    message = await aioconsole.ainput()
-    logger.info(message)
-    writer.write(f"{message}{line_break}".encode())
-    await writer.drain()
 
 
 async def main():
