@@ -24,10 +24,10 @@ async def read_message(reader):
     print(message)
 
 
-async def submit_message(writer):
+async def submit_message(writer, line_break="\n\n"):
     message = await aioconsole.ainput()
     logger.info(message)
-    writer.write(f"{message}\n\n".encode())
+    writer.write(f"{message}{line_break}".encode())
     await writer.drain()
 
 
