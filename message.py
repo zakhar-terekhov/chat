@@ -1,12 +1,10 @@
-import logging
-
 import aioconsole
 
-
-logger = logging.getLogger("message")
+from logger import setup_logger
 
 
 async def read_message(reader):
+    logger = setup_logger("read_message")
     raw = await reader.readline()
     message = raw.decode()
     logger.info(message)
@@ -14,6 +12,7 @@ async def read_message(reader):
 
 
 async def submit_message(writer):
+    logger = setup_logger("submit_message")
     message = await aioconsole.ainput()
     logger.info(message)
     writer.write(f"{message}\n\n".encode())
@@ -21,6 +20,7 @@ async def submit_message(writer):
 
 
 async def submit_registration_message(writer, message):
-    writer.write(f"{message}".encode())
+    logger = setup_logger("submit_registration_message")
     logger.info(message)
+    writer.write(f"{message}".encode())
     await writer.drain()

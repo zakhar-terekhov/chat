@@ -1,14 +1,14 @@
 import argparse
 import asyncio
 import json
-import logging
 
 from environs import Env
 
 from message import read_message, submit_message
+from logger import setup_logger
 
 
-logger = logging.getLogger("authorization")
+logger = setup_logger("authorization")
 
 
 async def authorize(token, reader, writer):
@@ -23,12 +23,6 @@ async def main():
     env.read_env()
 
     token = env.str("TOKEN")
-
-    logging.basicConfig(
-        level=logging.INFO,
-        filename="history.log",
-        format="%(levelname)s:%(name)s:%(message)s",
-    )
 
     parser = argparse.ArgumentParser(
         description="""Пользователь авторизуется по токену, предвариительно должен быть зарегистрирован.
@@ -54,8 +48,13 @@ async def main():
     response = await authorize(token, reader, writer)
 
     if json.loads(response) is None:
+        logger.info(f"Токен {token} неизвестен.")
         print("Неизвестный токен. Проверьте его или зарегистрируйте заново.")
         return
+
+    username = json.loads(response)["nickname"]
+
+    logger.info(f"Успешная авторизация пользователя {username} по токену {token}.")
 
     while True:
         await read_message(reader)

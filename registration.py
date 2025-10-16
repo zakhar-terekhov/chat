@@ -1,13 +1,13 @@
 import argparse
 import asyncio
-import logging
 
 from environs import Env
 
 from message import read_message, submit_registration_message
+from logger import setup_logger
 
 
-logger = logging.getLogger("registration")
+logger = setup_logger("registration")
 
 
 async def register(reader, writer, username):
@@ -21,12 +21,6 @@ async def register(reader, writer, username):
 async def main():
     env = Env()
     env.read_env()
-
-    logging.basicConfig(
-        level=logging.INFO,
-        filename="history.log",
-        format="%(levelname)s:%(name)s:%(message)s",
-    )
 
     parser = argparse.ArgumentParser(
         description="""Регистрирует пользователя в чате.""",
@@ -51,6 +45,7 @@ async def main():
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
     await register(reader, writer, args.username)
+    logger.info(f"Пользователь {args.username} зарегистрирован.")
 
 
 if __name__ == "__main__":
