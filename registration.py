@@ -10,7 +10,10 @@ from logger import setup_logger
 logger = setup_logger("registration")
 
 
-async def register(reader, writer, username):
+async def register(
+    reader: asyncio.StreamReader, writer: asyncio.StreamWriter, username: str
+):
+    """Регистрирует пользователя."""
     await read_message(reader)
     await submit_registration_message(writer, "\n")
     await read_message(reader)

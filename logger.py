@@ -1,7 +1,8 @@
 import logging
 
 
-def setup_logger(name, log_file="history.log"):
+def setup_logger(name: str, log_file="history.log") -> logging.Logger:
+    """Настраивает логгер."""
     logging.basicConfig(
         level=logging.INFO,
         filename=log_file,

@@ -1,9 +1,11 @@
+import asyncio
+
 import aioconsole
 
 from logger import setup_logger
 
 
-async def read_message(reader):
+async def read_message(reader: asyncio.StreamReader):
     logger = setup_logger("read_message")
     raw = await reader.readline()
     message = raw.decode()
@@ -11,7 +13,7 @@ async def read_message(reader):
     print(message)
 
 
-async def submit_message(writer):
+async def submit_message(writer: asyncio.StreamWriter):
     logger = setup_logger("submit_message")
     message = await aioconsole.ainput()
     logger.info(message)
@@ -19,7 +21,7 @@ async def submit_message(writer):
     await writer.drain()
 
 
-async def submit_registration_message(writer, message):
+async def submit_registration_message(writer: asyncio.StreamWriter, message: str):
     logger = setup_logger("submit_registration_message")
     logger.info(message)
     writer.write(f"{message}".encode())

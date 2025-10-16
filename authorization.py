@@ -11,7 +11,10 @@ from logger import setup_logger
 logger = setup_logger("authorization")
 
 
-async def authorize(token, reader, writer):
+async def authorize(
+    token: str, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+) -> str:
+    """Считывает введенный токен для авторизации и возвращает его."""
     writer.write(f"{token}\n\n".encode())
     await writer.drain()
     raw = await reader.readline()
@@ -38,23 +41,26 @@ async def main():
         default=env.int("WRITE_PORT"),
         help="Port for sending messages to the chat",
     )
-
     args = parser.parse_args()
 
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
     await read_message(reader)
 
-    response = await authorize(token, reader, writer)
+    authorization = await authorize(token, reader, writer)
 
-    if json.loads(response) is None:
-        logger.info(f"Токен {token} неизвестен.")
+    response = json.loads(authorization)
+
+    if response is None:
+        logger.info(
+            f"Неизвестный токен {token}. Проверьте его или зарегистрируйте заново."
+        )
         print("Неизвестный токен. Проверьте его или зарегистрируйте заново.")
         return
 
-    username = json.loads(response)["nickname"]
-
-    logger.info(f"Успешная авторизация пользователя {username} по токену {token}.")
+    logger.info(
+        f"Успешная авторизация пользователя {response['nickname']} по токену {token}."
+    )
 
     while True:
         await read_message(reader)
