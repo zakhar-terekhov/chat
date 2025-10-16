@@ -4,10 +4,18 @@ import logging
 
 from environs import Env
 
-from message import read_message, submit_message
+from message import read_message, submit_registration_message
 
 
 logger = logging.getLogger("registration")
+
+
+async def register(reader, writer, username):
+    await read_message(reader)
+    await submit_registration_message(writer, "\n")
+    await read_message(reader)
+    await submit_registration_message(writer, f"{username}\n")
+    await read_message(reader)
 
 
 async def main():
@@ -31,16 +39,18 @@ async def main():
         default=env.int("WRITE_PORT"),
         help="Port for sending messages to the chat",
     )
+    parser.add_argument(
+        "-U",
+        "--username",
+        default=env.str("USERNAME"),
+        help="Username",
+    )
 
     args = parser.parse_args()
 
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
-    await read_message(reader)
-
-    for _ in range(2):
-        await submit_message(writer, "\n")
-        await read_message(reader)
+    await register(reader, writer, args.username)
 
 
 if __name__ == "__main__":
