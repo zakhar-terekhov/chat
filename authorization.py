@@ -14,7 +14,7 @@ logger = setup_logger("authorization")
 async def authorize(
     token: str, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
 ) -> str:
-    """Считывает введенный токен для авторизации и возвращает его."""
+    """Авторизует пользователя по токену."""
     writer.write(f"{token}\n\n".encode())
     await writer.drain()
     raw = await reader.readline()
