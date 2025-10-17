@@ -25,8 +25,6 @@ async def main():
     env = Env()
     env.read_env()
 
-    token = env.str("TOKEN")
-
     parser = argparse.ArgumentParser(
         description="""Пользователь авторизуется по токену, предвариительно должен быть зарегистрирован.
         После успешной авторизации, скрипт позволяет отправлять сообщения в чат.
@@ -41,25 +39,31 @@ async def main():
         default=env.int("WRITE_PORT"),
         help="Port for sending messages to the chat",
     )
+    parser.add_argument(
+        "-T",
+        "--token",
+        default=env.str("TOKEN"),
+        help="Token for authorization",
+    )
     args = parser.parse_args()
 
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
     await read_message(reader)
 
-    authorization = await authorize(token, reader, writer)
+    authorization = await authorize(args.token, reader, writer)
 
     response = json.loads(authorization)
 
     if response is None:
         logger.info(
-            f"Неизвестный токен {token}. Проверьте его или зарегистрируйте заново."
+            f"Неизвестный токен {args.token}. Проверьте его или зарегистрируйте заново."
         )
         print("Неизвестный токен. Проверьте его или зарегистрируйте заново.")
         return
 
     logger.info(
-        f"Успешная авторизация пользователя {response['nickname']} по токену {token}."
+        f"Успешная авторизация пользователя {response['nickname']} по токену {args.token}."
     )
 
     while True:
