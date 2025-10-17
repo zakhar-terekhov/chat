@@ -14,9 +14,13 @@ async def register(
 ):
     """Регистрирует пользователя."""
     await read_message(reader)
+
     await submit_registration_message(writer, "\n")
+
     await read_message(reader)
+
     await submit_registration_message(writer, f"{username}\n")
+
     await read_message(reader)
 
 
@@ -47,7 +51,7 @@ async def main():
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
     await register(reader, writer, args.username)
-    
+
     logger.info(f"Пользователь {args.username} зарегистрирован.")
 
 

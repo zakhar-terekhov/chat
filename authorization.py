@@ -16,6 +16,7 @@ async def authorize(
     """Авторизует пользователя по токену."""
     writer.write(f"{token}\n\n".encode())
     await writer.drain()
+
     raw = await reader.readline()
     return raw.decode()
 
