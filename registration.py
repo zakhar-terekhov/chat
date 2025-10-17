@@ -3,9 +3,8 @@ import asyncio
 
 from environs import Env
 
-from message import read_message, submit_registration_message
 from logger import setup_logger
-
+from message import read_message, submit_registration_message
 
 logger = setup_logger("registration")
 
@@ -48,6 +47,7 @@ async def main():
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
     await register(reader, writer, args.username)
+    
     logger.info(f"Пользователь {args.username} зарегистрирован.")
 
 

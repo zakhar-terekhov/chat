@@ -4,9 +4,8 @@ import json
 
 from environs import Env
 
-from message import read_message, submit_message
 from logger import setup_logger
-
+from message import read_message, submit_message
 
 logger = setup_logger("authorization")
 
