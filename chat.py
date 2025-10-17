@@ -17,8 +17,12 @@ async def main():
     )
 
     parser.add_argument("-H", "--host", default=env.str("HOST"), help="Host")
-    parser.add_argument("-P", "--port", default=env.int("READ_PORT"), help="Read port for reading chat")
-    parser.add_argument("-F", "--history", default=env.str("HISTORY"), help="Path to chat history")
+    parser.add_argument(
+        "-P", "--port", default=env.int("READ_PORT"), help="Read port for reading chat"
+    )
+    parser.add_argument(
+        "-F", "--history", default=env.str("HISTORY"), help="Path to chat history"
+    )
 
     args = parser.parse_args()
 
