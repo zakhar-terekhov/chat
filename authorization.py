@@ -10,6 +10,19 @@ from message import read_message, submit_message
 logger = setup_logger("authorization")
 
 
+def check_response(response: json, token: str):
+    """Проверяет ответ сервера на авторизацию."""
+    if response is None:
+        logger.info(
+            f"Неизвестный токен {token}. Проверьте его или зарегистрируйте заново."
+        )
+        raise ValueError
+
+    logger.info(
+        f"Успешная авторизация пользователя {response['nickname']} по токену {token}."
+    )
+
+
 async def authorize(
     token: str, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
 ) -> str:
@@ -49,26 +62,23 @@ async def main():
 
     reader, writer = await asyncio.open_connection(args.host, args.port)
 
-    await read_message(reader)
-
-    authorization = await authorize(args.token, reader, writer)
-
-    response = json.loads(authorization)
-
-    if response is None:
-        logger.info(
-            f"Неизвестный токен {args.token}. Проверьте его или зарегистрируйте заново."
-        )
-        print("Неизвестный токен. Проверьте его или зарегистрируйте заново.")
-        return
-
-    logger.info(
-        f"Успешная авторизация пользователя {response['nickname']} по токену {args.token}."
-    )
-
-    while True:
+    try:
         await read_message(reader)
-        await submit_message(writer)
+
+        authorization = await authorize(args.token, reader, writer)
+        response = json.loads(authorization)
+        check_response(response, args.token)
+
+        while True:
+            await read_message(reader)
+            await submit_message(writer)
+
+    except ValueError:
+        print("Неизвестный токен. Проверьте его или зарегистрируйте заново.")
+
+    finally:
+        writer.close()
+        await writer.wait_closed()
 
 
 if __name__ == "__main__":

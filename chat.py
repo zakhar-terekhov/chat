@@ -7,6 +7,18 @@ from environs import Env
 from saving_history import write_message_to_file
 
 
+async def display_chat(reader: asyncio.StreamReader, history_path: str):
+    """Отображает чат."""
+    while True:
+        current_datetime = datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
+
+        raw = await reader.read(200)
+        message = f"[{current_datetime}] {raw.decode()}"
+
+        await write_message_to_file(message, history_path)
+        print(message)
+
+
 async def main():
     env = Env()
     env.read_env()
@@ -28,16 +40,13 @@ async def main():
 
     history_path = args.history
 
-    while True:
-        reader, _ = await asyncio.open_connection(args.host, args.port)
+    reader, writer = await asyncio.open_connection(args.host, args.port)
 
-        current_datetime = datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
-
-        raw = await reader.read(200)
-        message = f"[{current_datetime}] {raw.decode()}"
-
-        await write_message_to_file(message, history_path)
-        print(message)
+    try:
+        await display_chat(reader, history_path)
+    finally:
+        writer.close()
+        await writer.wait_closed()
 
 
 if __name__ == "__main__":
