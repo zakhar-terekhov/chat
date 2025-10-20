@@ -90,3 +90,4 @@ uv run authorization.py -T <TOKEN>
 Если токен не валиден, то программа сообщит об ошибке и закроет соединение.
 
 # Результаты
+![](https://github.com/zakhar-terekhov/Images/blob/main/chat.png?raw=true)
